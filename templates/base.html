@@ -2,17 +2,33 @@
 <html>
     <head>
         <title>{{title}}</title>
+        <style>
+            .error{
+                color:red;
+            }
+        </style>
     </head>
 <body>
 
     <div>
         <a href="/">home</a>
-
         <a href="/blog">all gorram post</a>
-
         <a href="/newpost">new frakkin post</a>
     </div>
-            
+    
+    <div style="text-align: right;">
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+    </div>  
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        <ul>
+        {% for category, message in messages %}
+            <li class="{{category}}">{{message}}</li>
+        {% endfor %}    
+        </ul>
+    {% endwith %}
+
 
     {% block content %}
     {% endblock %}
