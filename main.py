@@ -92,6 +92,11 @@ def index():
         return render_template('singleUser.html', title="Single Smeghead,", one_user=one_user)
     return render_template('index.html', title='home', users=users)
 
+@app.route('/singleUser')
+def singleUser():
+    blogs = Blog.query.all()
+    return render_template('singleUser.html', title="Single Smeghead")
+
 @app.route('/blog', methods=['POST', 'GET'])
 def list_of_posts():
   
@@ -120,15 +125,16 @@ def add_new_post():
         if body == '':
             body_error = "Please add some freakin text to the body"
 
-        owner = User.query.filter_by(user=session['user']).first()
+        
 
         if not title_error and not body_error:   #if it works
+            owner = User.query.filter_by(username=session['username']).first()
             new_blog = Blog(title, body, owner)   
             db.session.add(new_blog)
             db.session.commit()
             id = request.args.get('id')
-            one_entry = Blog(title, body)
-            return render_template('entry.html', title="Posted Smeg,", one_entry=one_entry)   
+            one_entry = Blog(title, body, owner)
+            return render_template('entry.html', title="Posted Smeg,", one_entry=one_entry, owner=owner)   
 
         else:
             return render_template('newpost.html', title_error=title_error, body_error=body_error)
