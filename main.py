@@ -34,7 +34,7 @@ class User(db.Model):
         
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup']
+    allowed_routes = ['login', 'signup', 'index', 'list_of_posts']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -48,7 +48,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             session['username'] = username
-            flash("You are here YEAH!")
+            flash("You are logged in YEAH!")
             return redirect('/')
         else:
             flash("Don't be a GIMBOID...wrong password or you don't exist", 'error')
@@ -63,7 +63,12 @@ def signup():
         password = request.form['password']
         verify = request.form['verify']
 
-        # TODO - user signup asst 'validate' user's data
+        # validate user's data
+        
+        verify_error = ""
+        if verify == "" or verify != password:
+            flash("Try using same password in the Verify", 'error')
+            return render_template('/signup.html')
 
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
@@ -89,13 +94,23 @@ def index():
     if request.args:
         user_id = request.args.get('id')
         one_user = User.query.filter_by(id=user_id).first()
-        return render_template('singleUser.html', title="Single Smeghead,", one_user=one_user)
+        return redirect('singleUser.html', title="Single Smeghead,", one_user=one_user)
     return render_template('index.html', title='home', users=users)
 
 @app.route('/singleUser')
 def singleUser():
+    
     blogs = Blog.query.all()
-    return render_template('singleUser.html', title="Single Smeghead")
+    owner = request.args.get('user')
+    
+    #for blog in blogs:
+        #print(blog)
+    #return owner
+    #username = request.args.get('owner_id')
+    #owner = User.query.filter_by(username=user).first()
+    #owner_post = Blog.query.filter_by(owner_id=owner.id).all()
+    blogs = Blog.query.filter_by(owner_id=owner).all()
+    return render_template('singleUser.html', title="Single Smeghead", blogs=blogs)
 
 @app.route('/blog', methods=['POST', 'GET'])
 def list_of_posts():
@@ -104,7 +119,7 @@ def list_of_posts():
     if request.args:
         blog_id = request.args.get('id')
         one_entry = Blog.query.filter_by(id=blog_id).first()
-        return render_template('entry.html', title="Posted Smeg,", one_entry=one_entry)
+        return render_template('entry.html', title="Posted Smeg", one_entry=one_entry)
     return render_template('blog.html',title="Build a smegging Blog!", blogs=blogs)
 
       

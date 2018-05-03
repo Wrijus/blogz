@@ -4,7 +4,17 @@
 
 <center>
 <h1>{{title}}</h1>
+
 </center>
- 
+
+<ul>
+    {% for blog in blogs %}
+    <li>{{blog.title}}</li>
+    <li>{{blog.body}}</li>
+    
+    <li>{{blog.owner.username}}</li>
+    {% endfor %}   
+    
+</ul>
 
 {% endblock %}
